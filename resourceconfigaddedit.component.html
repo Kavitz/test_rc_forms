@@ -1,0 +1,407 @@
+<div class="modal active" id="addresource" role="dialog" aria-labelledby="modal-title-active" aria-hidden="true" tabindex='-1' data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="n-dialog-header-fg-filler">
+                    <h1 class="modal-title-active">Add Resource Configuration</h1>
+                </div>
+                <div class="n-dialog-header-bg-filler"></div>
+				<div class="n-dialog-header-curve">
+					<div class="fg-mask"></div>
+					<div class="bg-mask"></div>
+					<div class="fg-corner"></div>
+					<div class="bg-corner"></div>
+				</div>
+                <i role="button" class="icon icon-close-rounded" data-dismiss="modal" aria-label="Close dialog" (click)="onAddCancel()"></i> 
+            </div>
+			<form [formGroup]="rcform">
+            <div class="modal-body">
+            	<div class="row formrow">
+                	<div class="col-sm-6 attrlabel">
+                    	<label class="control-label">Name:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input 
+                        type="text" 
+                        formControlName="rcname" 
+                        class="form-control n-inputfield"
+                        id="rname" 
+                        name="rname">
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+						<div *ngIf="rcname.errors && (rcname.dirty || rcname.touched)" class="custom-error">
+                        	<div [hidden]="!rcname.errors.required">
+                            	<span class="icon icon-error"></span>
+                                Name is required!
+                            </div>
+                        	<div [hidden]="!rcname.errors.cannotContainSpace">
+                            	<span class="icon icon-error"></span>
+                                Name should not contain space!
+                            </div>
+                            <div [hidden]="!rcname.errors.pattern">
+                            	<span class="icon icon-error"></span>
+                                Name should not contain any special characters!
+                            </div>
+                            <div [hidden]="!rcname.errors.shouldBeUnique">
+                            	<span class="icon icon-error"></span>
+                                Name should be unique!
+                            </div>
+                         </div>	
+                         <div *ngIf="rcname.pending" class="custom-error">
+                            <span class="icon icon-error"></span>
+                            checking for availability..
+                         </div>
+					</div>
+                </div>
+                <div class="row formrow">
+                	<div class="col-sm-6 attrlabel">
+                    	<label class="control-label">MQTT Server:</label>
+                    </div>
+                    <div class="col-sm-6">
+                    	<input type="text" formControlName="mqttserver" class="form-control n-inputfield" id="mqtt" name="mqtt">
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+						<div *ngIf="mqttserver.errors && (mqttserver.dirty || mqttserver.touched)" class="custom-error">
+                        	<div [hidden]="!mqttserver.errors.required">
+                            	<span class="icon icon-error"></span>
+                                MQTT Server is required!
+                            </div>
+                         </div>	
+					</div>
+                </div>
+                <div class="row formrow">
+					<div class="col-sm-6 attrlabel">
+						<label class="control-label">Disk Mode:</label>
+					</div>
+					<div class="col-sm-6">
+                        <select formControlName="diskmode" name="vmdmode" id='vmdmode'class="addresourceselect">
+                            <option value="nomode">Datastore default</option>
+                            <option value="thin">Thin Provision</option>
+                            <option value="thick">Thick Provision Lazy Zeroed</option>
+                            <option value="eagerZeroedThick">Thick Provision Eager Zeroed</option>
+                        </select>
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+							<div *ngIf="diskmode.errors && (diskmode.dirty || diskmode.touched)" class="custom-error">
+								<div [hidden]="!diskmode.errors.required">
+									<span class="icon icon-error"></span>                                
+									Disk Mode is required!
+								</div>        
+							</div>
+					</div>
+                </div>
+                <div class="row formrow formrowcheck">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">Local Install:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="n-checkbox" role="checkbox" aria-checked="false">
+                        <input type="checkbox" formControlName="localinstall" name="locally">
+                        <span class="checkbox-value"></span>
+                        </label>
+                    </div>
+                </div>
+				<div class="row formrow">
+					<div class="col-sm-6 attrlabel">
+						<label class="control-label">OVF Template:</label>
+					</div>
+					<div class="col-sm-6">
+						<select formControlName="ovftemplate" name="ovf" id="ovf" class="addresourceselect">
+							<option *ngFor="let ovftemplat of ovftemplates$ | async as ovf" [ngValue]="ovftemplat">{{ovftemplat.name}}</option>
+						</select>
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+							<div *ngIf="ovftemplate.errors && (ovftemplate.dirty || ovftemplate.touched)" class="custom-error">
+								<div [hidden]="!ovftemplate.errors.required">
+									<span class="icon icon-error"></span>                                
+									OVF Template is required!
+								</div>        
+							</div>
+					</div>
+				</div>
+				<div class="row formrow">
+					<div class="col-sm-6 attrlabel">
+						<label class="control-label">vCenter:</label>
+					</div>
+					<div class="col-sm-6">
+						<select formControlName="vcenter" name="vc" id="vc" class="addresourceselect">
+							<option *ngFor="let vcen of vcenters$ | async as vcente" [ngValue]="vcen">{{vcen.name}}</option>
+						</select>
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+						<div *ngIf="vcenter.errors && (vcenter.dirty || vcenter.touched)" class="custom-error">
+							<div [hidden]="!vcenter.errors.required">
+								<span class="icon icon-error"></span>
+								vCenter is required!
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row formrow">
+					<div class="col-sm-6 attrlabel">
+						<label class="control-label">Data Center:</label>
+					</div>
+                    <div class="col-sm-6">
+                        <select formControlName="datacenter" name="dc" id="dc" class="addresourceselect"
+                        [disabled]="rcform.controls.vcenter.value == ''">
+							<option *ngFor="let dcs of datacenter$ | async as datac" [ngValue]="dcs" >{{dcs}}</option>
+                        </select>
+						<a class="form-control-feedback">
+						<span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="datacenter.errors && (datacenter.dirty || datacenter.touched)" class="custom-error">
+                            <div [hidden]="!datacenter.errors.required">
+                                <span class="icon icon-error"></span>
+								DataCenter is required!
+ 							</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row formrow">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">Host/Cluster:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="cluster" name="cs" id="cs" class="addresourceselect"
+                        [disabled]="rcform.controls.datacenter.value == ''">
+                            <option *ngFor="let cl of clusters$  | async as clus" [ngValue]="cl" >{{cl}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="cluster.errors && (cluster.dirty || cluster.touched)" class="custom-error">
+                            <div [hidden]="!cluster.errors.required">
+                                <span class="icon icon-error"></span>
+								Host/Cluster is required!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="row formrow">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">Data Store:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="datastore" name="ds" id="ds"  
+						class="addresourceselect" [disabled]="rcform.controls.cluster.value == ''">
+                            <option *ngFor="let dst of datastores$ | async as dts" [ngValue]="dst" >{{dst}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="datastore.errors && (datastore.dirty || datastore.touched)" class="custom-error">
+                            <div [hidden]="!datastore.errors.required">
+                                <span class="icon icon-error"></span>
+								DataStore is required!
+                            </div>
+                        </div>
+                    </div>
+                </div>			
+				<div class="row formrow">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">Network:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="network" name="nw" id="nw" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let nwo of networks$ | async as net" [ngValue]="nwo" >{{nwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="network.errors && (network.dirty || network.touched)" class="custom-error">
+                            <div [hidden]="!network.errors.required">
+                                <span class="icon icon-error"></span>
+                                Network is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetGMRE:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkgmre" name="ngmre" id="ngmre" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netg of networks$ | async as netgmre" [ngValue]="netg" >{{netg}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkgmre.errors && (networkgmre.dirty || networkgmre.touched)" class="custom-error">
+                            <div [hidden]="!networkgmre.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetGMRE is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="row formrow formrowcheck">
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">Configure Other Ports:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="n-checkbox" role="checkbox" aria-checked="false">
+                        <input type="checkbox" formControlName="configureallports" name="conallports">
+                        <span class="checkbox-value"></span>
+                        </label>
+                    </div>
+                </div>
+                
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetOAMP:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkoamp" name="noamp" id="noamp" class="addresourceselect"
+                         [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let neto of networks$ | async as netoamp" [ngValue]="neto" >{{neto}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkoamp.errors && (networkoamp.dirty || networkoamp.touched)" class="custom-error">
+                            <div [hidden]="!networkoamp.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetOAMP is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow"  [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetE1:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networke1" name="ne1" id="ne1" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let neone of networks$ | async as nete1" [ngValue]="neone" >{{neone}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networke1.errors && (networke1.dirty || networke1.touched)" class="custom-error">
+                            <div [hidden]="!networke1.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetE1 is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetE2:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networke2" name="ne2" id="ne2" class="addresourceselect" 
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as nete2" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networke2.errors && (networke2.dirty || networke2.touched)" class="custom-error">
+                            <div [hidden]="!networke2.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetE2 is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                <div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetVOIP:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkvoip" name="nevoip" id="nevoip" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as netvoip" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkvoip.errors && (networkvoip.dirty || networkvoip.touched)" class="custom-error">
+                            <div [hidden]="!networkvoip.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetVOIP is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetILAN:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkilan" name="neilan" id="neilan" class="addresourceselect" 
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as netilam" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkilan.errors && (networkilan.dirty || networkilan.touched)" class="custom-error">
+                            <div [hidden]="!networkilan.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetILAN is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetCIT:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkcit" name="necit" id="necit" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as netcit" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkcit.errors && (networkcit.dirty || networkcit.touched)" class="custom-error">
+                            <div [hidden]="!networkcit.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetCIT is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetAUXA:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkauxa" name="neta" id="neta" class="addresourceselect"
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as netauxa" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkauxa.errors && (networkauxa.dirty || networkauxa.touched)" class="custom-error">
+                            <div [hidden]="!networkauxa.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetAUXA is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+				<div class="row formrow" [hidden]='!rcform.controls.configureallports.value'>
+                    <div class="col-sm-6 attrlabel">
+                        <label class="control-label">NetAUXS:</label>
+                    </div>
+                    <div class="col-sm-6">
+                        <select formControlName="networkauxs" name="netb" id="netb" class="addresourceselect" 
+                        [disabled]="rcform.controls.cluster.value == ''">
+                                <option *ngFor="let netwo of networks$ | async as netauxs" [ngValue]="netwo" >{{netwo}}</option>
+                        </select>
+                        <a class="form-control-feedback">
+                        <span class="icon icon-mandatory"></span></a>
+                        <div *ngIf="networkauxs.errors && (networkauxs.dirty || networkauxs.touched)" class="custom-error">
+                            <div [hidden]="!networkauxs.errors.required">
+                                <span class="icon icon-error"></span>
+                                NetAUXS is required!
+                            </div>
+                         </div>
+                    </div>
+                </div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-standard" type="submit" name="submit" >Save</button>
+				<button class="btn btn-standard" data-dismiss="modal" (click)="onAddCancel()">Cancel</button>
+			</div>
+			</form>
+        </div>
+    </div>
+</div>
