@@ -12,7 +12,7 @@ import { DISABLED } from '@angular/forms/src/model';
     templateUrl: 'resourceconfigaddedit.component.html'
 })
 
-export class ResourceconfigAddEditComponent implements OnInit{
+export class ResourceconfigAddEditComponent implements OnInit, AfterViewInit{
     private emptyrcobject: ResourceConfig = {name: '', mqttserver: '', diskmode:'nomode', localinstall: false, vcenter: {name:'', ipaddress:'', username:'', password:''}, ovftemplate: {name:'',product:'', version:'', url:''} , datastore: '', datacenter: '', cluster:'', network:'',netgmre:'',netoamp:'',nete1:'',nete2:'', netvoip:'', netilan:'', netcit:'', netauxa:'', netauxb:''};
     private addResource: ResourceConfig = Object.assign({}, this.emptyrcobject);
     private vcenters$: Observable<Array<Vcenter>>;
@@ -26,8 +26,6 @@ export class ResourceconfigAddEditComponent implements OnInit{
     }
 
     ngOnInit() {
-        //this.v1830RestService.getVcenter().subscribe((res => this.vcenters$ = res));
-        //this.v1830RestService.getOvfs().subscribe((res => this.ovftemplates$ = res));
         this.vcenters$ = this.v1830RestService.getVcenter();
         this.ovftemplates$ = this.v1830RestService.getOvfs();
         this.onChanges();
@@ -118,31 +116,22 @@ export class ResourceconfigAddEditComponent implements OnInit{
         return this.rcform.get('networkauxs');
     }
 
-    
-    onChanges(): void {
-        console.log('this.vcenter.value.name', this.vcenter.value.name);
-        console.log('this.datacenter.value', this.datacenter.value);
-        console.log('this.cluster.value', this.cluster.value);
-        if(this.vcenter.value.name == '') {
-            this.datacenter.disable();
-        } 
-        if(this.datacenter.value == '') {
-            this.cluster.disable();
-        }
-        if(this.cluster.value == '') {
-            this.datastore.disable();
-            this.network.disable();
-            this.networkgmre.disable();
-            this.networkoamp.disable();
-            this.networke1.disable();
-            this.networke2.disable();
-            this.networkvoip.disable();
-            this.networkcit.disable();
-            this.networkilan.disable();
-            this.networkauxa.disable();
-            this.networkauxs.disable();
-        }
-      
+    ngAfterViewInit(){
+        this.datacenter.disable();
+        this.cluster.disable();
+        this.datastore.disable();
+        this.network.disable();
+        this.networkgmre.disable();
+        this.networkoamp.disable();
+        this.networke1.disable();
+        this.networke2.disable();
+        this.networkvoip.disable();
+        this.networkcit.disable();
+        this.networkilan.disable();
+        this.networkauxa.disable();
+        this.networkauxs.disable();
+    }
+    onChanges(): void {   
         this.rcform.get('ovftemplate').valueChanges.subscribe(val => {
             console.log(val);
         });
@@ -152,6 +141,11 @@ export class ResourceconfigAddEditComponent implements OnInit{
         });
         this.vcenter.valueChanges.subscribe(val => {
             console.log('vcenter changed');
+            if(this.vcenter.value.name == '') {
+                this.datacenter.disable();
+            } else {
+                this.datacenter.enable();
+            }
             this.datacenter.setValue('');
             this.cluster.setValue('');
             this.datastore.setValue('');
@@ -170,6 +164,11 @@ export class ResourceconfigAddEditComponent implements OnInit{
         });
         this.datacenter.valueChanges.subscribe(val => {
             console.log('datacenter changed');
+            if(this.datacenter.value == '') {
+                this.cluster.disable();
+            } else {
+                this.cluster.enable();
+            }
             this.datastore.setValue('');
             this.network.setValue('');
             this.networkgmre.setValue('');
@@ -182,13 +181,40 @@ export class ResourceconfigAddEditComponent implements OnInit{
             this.networkauxa.setValue('');
             this.networkauxs.setValue('');
             this.networkoamp.setValue('');
-            let dcobj = Object.assign({}, this.vcenter.value);
-            dcobj['datacenter'] = val;
-            console.log('dcobj --- ', dcobj);
-            this.clusters$ = this.v1830RestService.getClusterForVC(dcobj);
+            if ( val != '' ) {
+                let dcobj = Object.assign({}, this.vcenter.value);
+                dcobj['datacenter'] = val;
+                console.log('dcobj --- ', dcobj);
+                this.clusters$ = this.v1830RestService.getClusterForVC(dcobj);
+            }
         });
         this.cluster.valueChanges.subscribe(val => {
             console.log('cluster changed');
+            if(this.cluster.value == '') {
+                this.datastore.disable();
+                this.network.disable();
+                this.networkgmre.disable();
+                this.networkoamp.disable();
+                this.networke1.disable();
+                this.networke2.disable();
+                this.networkvoip.disable();
+                this.networkcit.disable();
+                this.networkilan.disable();
+                this.networkauxa.disable();
+                this.networkauxs.disable();
+            } else {
+                this.datastore.enable();
+                this.network.enable();
+                this.networkgmre.enable();
+                this.networkoamp.enable();
+                this.networke1.enable();
+                this.networke2.enable();
+                this.networkvoip.enable();
+                this.networkcit.enable();
+                this.networkilan.enable();
+                this.networkauxa.enable();
+                this.networkauxs.enable();
+            }
             this.datastore.setValue('');
             this.network.setValue('');
             this.networkgmre.setValue('');
@@ -201,12 +227,41 @@ export class ResourceconfigAddEditComponent implements OnInit{
             this.networkauxa.setValue('');
             this.networkauxs.setValue('');
             this.networkoamp.setValue('');
-            let clobj = Object.assign({}, this.vcenter.value);
-            clobj['datacenter'] = this.datacenter.value;
-            clobj['cluster'] = val;
-            console.log('clobj --- ', clobj);
-            this.datastores$ = this.v1830RestService.getDataStoreForVC(clobj);
-            this.networks$ = this.v1830RestService.getNetworkForVC(clobj);
+            if(this.datacenter.value != '' && val != '') {
+                let clobj = Object.assign({}, this.vcenter.value);
+                clobj['datacenter'] = this.datacenter.value;
+                clobj['cluster'] = val;
+                console.log('clobj --- ', clobj);
+                this.datastores$ = this.v1830RestService.getDataStoreForVC(clobj);
+                this.networks$ = this.v1830RestService.getNetworkForVC(clobj);
+            }
+        });
+
+        this.network.valueChanges.subscribe(val => {
+            if(this.networkoamp.value == '' || this.configureallports.value == false) {
+                this.networkoamp.setValue(this.network.value);
+            }
+            if(this.networke1.value == '' || this.configureallports.value == false) {
+                this.networke1.setValue(this.network.value);
+            }
+            if(this.networke2.value == '' || this.configureallports.value == false) {
+                this.networke2.setValue(this.network.value);
+            }
+            if(this.networkvoip.value == '' || this.configureallports.value == false) {
+                this.networkvoip.setValue(this.network.value);
+            }
+            if(this.networkilan.value == '' || this.configureallports.value == false) {
+                this.networkilan.setValue(this.network.value);
+            }
+            if(this.networkcit.value == '' || this.configureallports.value == false) {
+                this.networkcit.setValue(this.network.value);
+            }
+            if(this.networkauxa.value == '' || this.configureallports.value == false) {
+                this.networkauxa.setValue(this.network.value);
+            }
+            if(this.networkauxs.value == '' || this.configureallports.value == false) {
+                this.networkauxs.setValue(this.network.value);
+            }    
         });
     }
 
